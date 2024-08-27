@@ -1,7 +1,7 @@
 $(document).ready(function () {
-    // Fetch and render items from the server
-    function fetchItems() {
-        $.get('/items', function (data) {
+    // Function to fetch and render items
+    function fetchItems(searchTerm = '') {
+        $.get('/items', { search: searchTerm }, function (data) {
             const itemList = $('#itemList');
             itemList.empty();
             data.forEach(function (item) {
@@ -18,9 +18,24 @@ $(document).ready(function () {
         });
     }
 
+    // Initial fetch of all items
     fetchItems();
 
-    // Add item
+    // Handle search form submission
+    $('#searchForm').submit(function (e) {
+        e.preventDefault();
+        const searchTerm = $('#searchInput').val().trim();
+        fetchItems(searchTerm);
+    });
+
+    // Clear search results
+    $('#clearSearch').click(function (e) {
+        e.preventDefault();
+        $('#searchInput').val('');
+        fetchItems();
+    });
+
+    // Add item functionality
     $('#itemForm').submit(function (e) {
         e.preventDefault();
         const itemName = $('#itemInput').val().trim();
@@ -32,7 +47,7 @@ $(document).ready(function () {
         }
     });
 
-    // Edit item
+    // Edit item functionality
     $(document).on('click', '.edit-btn', function () {
         const itemId = $(this).data('id');
         const newName = prompt('Edit item name:');
@@ -48,7 +63,7 @@ $(document).ready(function () {
         }
     });
 
-    // Delete item
+    // Delete item functionality
     $(document).on('click', '.delete-btn', function () {
         const itemId = $(this).data('id');
         $.ajax({
