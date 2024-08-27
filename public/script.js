@@ -4,17 +4,30 @@ $(document).ready(function () {
         $.get('/items', { search: searchTerm }, function (data) {
             const itemList = $('#itemList');
             itemList.empty();
-            data.forEach(function (item) {
-                itemList.append(`
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm edit-btn" data-id="${item.id}">Edit</button>
-                            <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}">Delete</button>
-                        </td>
-                    </tr>
-                `);
-            });
+
+            // Check if the data is an array
+            if (Array.isArray(data)) {
+                data.forEach(function (item) {
+                    const itemRow = `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm edit-btn" data-id="${item.id}">Edit</button>
+                                <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    itemList.append(itemRow);
+                });
+            } else {
+                console.error('Expected an array but got:', typeof data);
+            }
+
+            // Hide edit and delete buttons for normal users
+            if (window.location.pathname === '/user.html') {
+                $('.edit-btn').hide();
+                $('.delete-btn').hide();
+            }
         });
     }
 
@@ -73,5 +86,11 @@ $(document).ready(function () {
                 fetchItems();
             }
         });
+    });
+
+    // Logout functionality
+    $('#logoutBtn').click(function (e) {
+        e.preventDefault();
+        window.location.href = '/logout';
     });
 });
